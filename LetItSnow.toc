@@ -1,9 +1,17 @@
 ## Interface: 30200
-## Title: Let It Snow
-## Notes: Bringing christmas joy to all the good and bad players
+## Title: Let It Snow!
+## Notes: "But as long as you love me so, Let It Snow! Let It Snow! Let It Snow!"
 ## Author: Shadowed
 ## SavedVariables: LetItSnowDB
 
+libs\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceTimer-3.0\AceTimer-3.0.xml
+
 localization.enUS.lua
 
+config.lua
 LetItSnow.lua
