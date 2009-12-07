@@ -1,0 +1,9 @@
+## Interface: 30200
+## Title: Let It Snow
+## Notes: Bringing christmas joy to all the good and bad players
+## Author: Shadowed
+## SavedVariables: LetItSnowDB
+
+localization.enUS.lua
+
+LetItSnow.lua
