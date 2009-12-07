@@ -1,8 +1,8 @@
 ## Interface: 30200
-## Title: Let It Snow!
-## Notes: "But as long as you love me so, Let It Snow! Let It Snow! Let It Snow!"
+## Title: Screen Shadow
+## Notes: Let's you setup an image that will fall from the top off your screen.
 ## Author: Shadowed
-## SavedVariables: LetItSnowDB
+## SavedVariables: ScreenShadowDB
 
 libs\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
@@ -14,4 +14,4 @@ libs\AceTimer-3.0\AceTimer-3.0.xml
 localization.enUS.lua
 
 config.lua
-LetItSnow.lua
+ScreenShadow.lua

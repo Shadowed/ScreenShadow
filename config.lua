@@ -1,26 +1,27 @@
-local L = LetItSnowLocals
+local L = ScreenShadowLocals
 local Config = {}
 local AceDialog, AceRegistry, options
 
-LetItSnowLocals = setmetatable(LetItSnowLocals, {
-	__index = function(tbl, value)
-		rawset(tbl, value, value)
-		return value
-	end,
-})
-
 local function set(info, value)
-	LetItSnow.db[info[#(info)]] = value
-	LetItSnow:WatchEvents()
-	LetItSnow:CheckStatus()
+	ScreenShadow.db.profile[info[#(info) - 1]][info[#(info)]] = value
+	ScreenShadow:WatchEvents()
+	ScreenShadow:CheckStatus()
 end
 
 local function sliderSet(info, value)
-	LetItSnow.db[info[#(info)]] = value
+	ScreenShadow.db.profile[info[#(info) - 1]][info[#(info)]] = value
 end
 
 local function get(info)
-	return LetItSnow.db[info[#(info)]]
+	return ScreenShadow.db.profile[info[#(info) - 1]][info[#(info)]]
+end
+
+local flakeSet = {}
+local function getFlakeSet()
+	table.wipe(flakeSet)
+	for type, set in pairs(ScreenShadow.IMAGE_SETS) do flakeSet[type] = set.name end
+	
+	return flakeSet
 end
 
 local function loadGeneralOptions()
@@ -37,53 +38,51 @@ local function loadGeneralOptions()
 				inline = true,
 				name = L["General"],
 				args = {
-					onHandfulSnowflakes = {
-						order = 1,
-						type = "toggle",
-						name = L["Snowfall when snowflaked"],
-						desc = L["Automatically snowfalls you when somebody uses Handful of Snowflakes on yourself."],
-						width = "full",
-					},
-					inCombat = {
-						order = 2,
-						type = "toggle",
-						name = L["Enable in combat"],
-						desc = L["Enables snowfalls in combat, otherwise disables all snowfalls in combat and will automatically hide any actively falling snow when you enter combat."],
-					},
-					whileGrouped = {
-						order = 3,
-						type = "toggle",
-						name = L["Enable while grouped"],
-						desc = L["Enables snowfall while grouped, otherwise disables it while in any party or raid."],
-					},
-					snowMelt = {
-						order = 4,
-						type = "toggle",
-						name = L["Enable snow buildup"],
-						desc = L["Instead of falling off the screen, snow will build up on the bottom and gradually fade out."],
-						hidden = true,
-					},
-				},
-			},
-			snowFall = {
-				order = 1,
-				type = "group",
-				inline = true,
-				name = L["Snowfall"],
-				args = {
-					snowType = {
+					set = {
 						order = 1,
 						type = "select",
-						name = L["Snowfall density"],
-						desc = L["How heavy it should snow whenever an interval snowfall comes up."],
-						values = {["light"] = L["Light"], ["heavy"] = L["Heavy"]},
+						name = L["Flake set"],
+						desc = L["Set of images that should be used for fallin!g"],
+						values = getFlakeSet,
 					},
 					sep = {
 						order = 2,
 						type = "description",
 						name = "",
 					},
-					minFallInterval = {
+					inCombat = {
+						order = 3,
+						type = "toggle",
+						name = L["Enable in combat"],
+						desc = L["Enables falling flakes in combat, otherwise disables them in combat and will automatically hide any actively falling flakes when you enter combat."],
+					},
+					whileGrouped = {
+						order = 4,
+						type = "toggle",
+						name = L["Enable while grouped"],
+						desc = L["Enables falling flakes while grouped, otherwise disables it while in any party or raid."],
+					},
+				},
+			},
+			fall = {
+				order = 1,
+				type = "group",
+				inline = true,
+				name = L["Fall settings"],
+				args = {
+					type = {
+						order = 1,
+						type = "select",
+						name = L["Density"],
+						desc = L["How many flakes should be falling whenever a fall comes up."],
+						values = {["drizzle"] = L["Drizzle (25 flakes)"], ["light"] = L["Light (50 flakes)"], ["medium"] = L["Medium (75 flakes)"], ["heavy"] = L["Heavy (100 flakes)"], ["blizzard"] = L["Blizzard (200 flakes)"]},
+					},
+					sep = {
+						order = 2,
+						type = "description",
+						name = "",
+					},
+					minInterval = {
 						order = 3,
 						type = "range",
 						name = L["Minimum seconds between falls"],
@@ -91,7 +90,7 @@ local function loadGeneralOptions()
 						min = 30, max = 600, step = 10,
 						set = setSlider,
 					},
-					fallRandomizer = {
+					minRandom = {
 						order = 4,
 						type = "range",
 						name = L["Fall randomizer"],
@@ -105,13 +104,13 @@ local function loadGeneralOptions()
 				order = 2,
 				type = "group",
 				inline = true,
-				name = L["Snowflakes"],
+				name = L["Flakes"],
 				args = {
-					flakeAlpha = {
+					alpha = {
 						order = 1,
 						type = "range",
 						name = L["Flake alpha"],
-						desc = L["Transparency of each snowflake."],
+						desc = L["Transparency of each flake."],
 						min = 0.50, max = 1, step = 0.05, isPercent = true,
 						set = setSlider,
 					},
@@ -120,15 +119,15 @@ local function loadGeneralOptions()
 						type = "description",
 						name = "",
 					},
-					flakeSize = {
+					size = {
 						order = 3,
 						type = "range",
 						name = L["Flake size"],
-						desc = L["How big each snowflake should be."],
+						desc = L["How big each flake should be."],
 						min = 5, max = 20, step = 1,
 						set = setSlider,
 					},
-					sizeRandomizer = {
+					sizeRandom = {
 						order = 4,
 						type = "range",
 						name = L["Size randomizer"],
@@ -169,7 +168,7 @@ local function loadExtraOptions()
 				name = L["Falling"],
 				set = setSlider,
 				args = {
-					startSide = {
+					side = {
 						order = 1,
 						type = "select",
 						name = L["Start from"],
@@ -182,18 +181,18 @@ local function loadExtraOptions()
 						type = "description",
 						name = "",
 					},
-					fallDuration = {
+					seconds = {
 						order = 3,
 						type = "range",
 						name = L["Fall duration"],
-						desc = L["How long it should take before a snowflake hits the bottom of the screen."],
+						desc = L["How long it should take before a flake hits the bottom of the screen."],
 						min = 10, max = 60, step = 1,
 					},
-					fallDurRandomizer = {
+					secondsRandom = {
 						order = 4,
 						type = "range",
 						name = L["Fall randomizer"],
-						desc = L["Another randomizer for fall duration. For example, if you set this to 10 and fall duration to 30 then snowflakes can take anywhere from 20 to 40 seconds to fall."],
+						desc = L["Another randomizer for fall duration. For example, if you set this to 10 and fall duration to 30 then flakes can take anywhere from 20 to 40 seconds to fall."],
 					},
 				},
 			},
@@ -204,33 +203,68 @@ local function loadExtraOptions()
 				name = L["Drifting"],
 				set = setSlider,
 				args = {
-					driftScreen = {
+					screenWidth = {
 						order = 1,
 						type = "range",
 						min = 0.10, max = 1, step = 0.10, isPercent = true,
 						name = L["Available drift space"],
-						desc = L["How much of the screen snowflakes can drift, 50% will have them drift using half of the screen."],
+						desc = L["How much of the screen flakes can drift, 50% will have them drift using half of the screen."],
 					},
-					driftRandomizer = {
+					screenRandom = {
 						order = 2,
 						type = "range",
 						min = 0, max = 1, step = 0.05, isPercent = true,
 						name = L["Drift space randomizer"],
 						desc = L["Randomizer for drift space. For example, if you set this to 20% and drift space to 30% it can use between 10% and 50% of the screen."],
 					},
-					driftDuration = {
+					seconds = {
 						order = 3,
 						type = "range",
 						min = 10, max = 60, step = 5,
 						name = L["Drift interval"],
-						desc = L["How long it should take a snowflake to complete one drift in seconds."],
+						desc = L["How long it should take a flake to complete one drift in seconds."],
 					},
-					driftDurRandomizer = {
+					secondsRandom = {
 						order = 4,
 						type = "range",
 						min = 0, max = 60, step = 5,
 						name = L["Drift interval randomizer"],
 						desc = L["Works the same as all the other randomizers! Except this one is for the drift interval."],
+					},
+				},
+			},
+			rotation = {
+				order = 3,
+				type = "group",
+				inline = true,
+				name = L["Rotation"],
+				set = setSlider,
+				args = {
+					degrees = {
+						order = 1,
+						type = "range",
+						min = 0, max = 360, step = 10,
+						name = L["Degree rotation"],
+						desc = L["How many degrees flakes should rotate overall."],
+					},
+					sep = {
+						order = 2,
+						type = "description",
+						name = "",
+					},
+					seconds = {
+						order = 2,
+						type = "range",
+						min = 10, max = 30, step = 5,
+						name = L["Seconds to rotate"],
+						desc = L["How many seconds it should take to rotate the flake."],
+					},
+					secondsRandom = {
+						order = 3,
+						type = "range",
+						min = 0, max = 30, step = 1,
+						name = L["Seconds randomizer"],
+						desc = L["Randomizer for rotations."],
 					},
 				},
 			},
@@ -241,7 +275,7 @@ end
 local function loadOptions()
 	options = {
 		type = "group",	
-		name = "Let It Snow!",
+		name = "Screen Shadow",
 		childGroups = "tab",
 		args = {},
 	}
@@ -251,45 +285,43 @@ local function loadOptions()
 end
 
 local function print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Let It Snow|r: " .. msg)
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Screen Shadow|r: " .. msg)
 end
 
 
-SLASH_LETITSNOW1 = "/letitsnow"
-SLASH_LETITSNOW2 = "/lis"
-SlashCmdList["LETITSNOW"] = function(msg)
+SLASH_SCREENSHADOW1 = "/screenshadow"
+SLASH_SCREENSHADOW2 = "/screen"
+SLASH_SCREENSHADOW3 = "/ss"
+SlashCmdList["SCREENSHADOW"] = function(msg)
 	if( not AceDialog and not AceRegistry ) then
 		loadOptions()
 		
 		AceDialog = LibStub("AceConfigDialog-3.0")
 		AceRegistry = LibStub("AceConfigRegistry-3.0")
-		LibStub("AceConfig-3.0"):RegisterOptionsTable("LetItSnow", options)
-		AceDialog:SetDefaultSize("LetItSnow", 500, 450)
+		LibStub("AceConfig-3.0"):RegisterOptionsTable("ScreenShadow", options)
+		AceDialog:SetDefaultSize("ScreenShadow", 500, 450)
 	end
 		
-	AceDialog:Open("LetItSnow")
+	AceDialog:Open("ScreenShadow")
 end
 
 SLASH_SNOW1 = "/snow"
 SlashCmdList["SNOW"] = function(msg)
 	msg = string.trim(string.lower(msg or ""))
 	
-	if( msg == "heavy" ) then
-		print("Forecasts call for heavy snow!")
-		for i=1, 100 do
-			LetItSnow:ScheduleTimer("GenerateFlake", math.random(0, LetItSnow.db.fallDuration))
-		end
-		
-	elseif( msg == "light" ) then
-		print("Forecasts call for light snow!")
-		for i=1, 50 do
-			LetItSnow:ScheduleTimer("GenerateFlake", math.random(0, LetItSnow.db.fallDuration))
+	local total = msg == "drizzle" and 25 or msg == "light" and 50 or msg == "medium" and 75 or msg == "heavy" and 100 or 200
+	if( total ) then
+		print(string.format(L["Generating %s test flakes."], total))
+		for i=1, total do
+			ScreenShadow:ScheduleTimer("GenerateFlake", math.random(0, ScreenShadow.db.profile.fall.seconds))
 		end
 	elseif( msg == "stop" ) then
-		print("Forecasts predict it will clear up :(")
-		LetItSnow:CancelTimer("GenerateFlake", true)
-		LetItSnow:GradualStop()
+		print(L["Stopping all generated flakes."])
+		ScreenShadow:CancelTimer("GenerateFlake", true)
+		ScreenShadow:GradualStop()
 	else
-		print("Type either /snow light for simulating light snow, /snow heavy for heavy snow or /snow stop to stop all snow.")
+		print(L["Slash commands"])
+		DEFAULT_CHAT_FRAME:AddMessage(L["/snow drizzle/light/medium/heavy - Generates example falls based on the passed density"])
+		DEFAULT_CHAT_FRAME:AddMessage(L["/snow stop - Stops all falling flakes"])
 	end
 end
