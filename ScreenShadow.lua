@@ -194,8 +194,9 @@ function ScreenShadow:GenerateFlake()
 	frame.driftAnim:Play()
 	
 	-- Sets the flakes to rotation 360 degrees clockwise if they are starting from the left side, counterclockwise if they start on the right
+	local rotateMod = math.random(1, 2) == 1 and 1 or -1
 	frame.rotateAnim:SetDuration(self.db.profile.rotation.seconds + math.random(-self.db.profile.rotation.secondsRandom, self.db.profile.rotation.secondsRandom))
-	frame.rotateAnim:SetDegrees(xMod * self.db.profile.rotation.degrees)
+	frame.rotateAnim:SetDegrees(rotateMod * self.db.profile.rotation.degrees)
 	frame.rotateAnim:SetSmoothing("OUT")
 	frame.rotateAnim:SetStartDelay(math.random(0, 50) / 100)
 	frame.rotateAnim:Play()
@@ -257,7 +258,8 @@ function ScreenShadow:RegisterSet(type, name, ...)
 end
 
 -- Register the default set of course
-ScreenShadow:RegisterSet("snowflakes", L["Snowflakes"], "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\1", "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\2", "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\3", "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\4", "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\5", "Interface\\AddOns\\ScreenShadow\\sets\\snowflake\\6")
+ScreenShadow:RegisterSet("snowflakes", L["Snowflakes"], "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\1", "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\2", "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\3", "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\4", "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\5", "Interface\\AddOns\\ScreenShadow\\sets\\snowflakes\\6")
+ScreenShadow:RegisterSet("petals", L["Petals"], "Interface\\AddOns\\ScreenShadow\\sets\\petals\\1", "Interface\\AddOns\\ScreenShadow\\sets\\petals\\2", "Interface\\AddOns\\ScreenShadow\\sets\\petals\\3", "Interface\\AddOns\\ScreenShadow\\sets\\petals\\4")
 
 
 ScreenShadow:RegisterEvent("ADDON_LOADED")

@@ -43,6 +43,7 @@ ScreenShadowLocals = {
 	["Light (50 flakes)"] = "Light (50 flakes)",
 	["Medium (75 flakes)"] = "Medium (75 flakes)",
 	["Minimum seconds between falls"] = "Minimum seconds between falls",
+	["Petals"] = "Petals",
 	["Randomizer for drift space. For example, if you set this to 20% and drift space to 30% it can use between 10% and 50% of the screen."] = "Randomizer for drift space. For example, if you set this to 20% and drift space to 30% it can use between 10% and 50% of the screen.",
 	["Randomizer for rotations."] = "Randomizer for rotations.",
 	["Right side"] = "Right side",
