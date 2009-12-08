@@ -309,7 +309,7 @@ SLASH_SNOW1 = "/snow"
 SlashCmdList["SNOW"] = function(msg)
 	msg = string.trim(string.lower(msg or ""))
 	
-	local total = msg == "drizzle" and 25 or msg == "light" and 50 or msg == "medium" and 75 or msg == "heavy" and 100 or 200
+	local total = msg == "drizzle" and 25 or msg == "light" and 50 or msg == "medium" and 75 or msg == "heavy" and 100 or msg == "blizzard" and 200
 	if( total ) then
 		print(string.format(L["Generating %s test flakes."], total))
 		for i=1, total do
